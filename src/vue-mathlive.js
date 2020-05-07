@@ -64,21 +64,26 @@ export default {
             // update the mathfield to stay in sync, but don't send back content
             // change notifications, to avoid infinite loops.
             if (newValue !== oldValue) {
-                this.$el.mathfield.$latex(newValue, {
-                    suppressChangeNotifications: true,
-                });
+                if (this.$el.mathfield) {
+                    this.$el.mathfield.$latex(newValue, {
+                        suppressChangeNotifications: true,
+                    });
+                }
             }
         },
         config: {
             deep: true,
             handler: function (config) {
-                this.$el.mathfield.$setConfig(config);
+                if (this.$el.mathfield) {
+                    this.$el.mathfield.$setConfig(config);
+                }
             },
         },
     },
     mounted: function () {
         // A new instance is being created
         // Wait until the DOM has been constructed...
+        const self = this;
         this.$nextTick(() => {
             // ... then make the Mathfield
             this.$mathlive.makeMathField(this.$el, {
@@ -124,7 +129,7 @@ export default {
                 // Those notification handlers expect an answer back, so translate
                 // them to callbacks via props
                 onKeystroke: function (_, keystroke, ev) {
-                    return this.onKeystroke(keystroke, ev);
+                    return self.onKeystroke(keystroke, ev);
                 },
                 onMoveOutOf: (_, direction) => {
                     return this.onMoveOutOf(direction);
